@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -67,17 +68,19 @@ public class Server {
 	
 	private synchronized void broadcastFile(ChatMessage message) {
 
-		final String location = 
-        		"C:\\Users\\Hamza Karachiwala\\Documents\\Fall 16\\Networks\\Project\\";
-
 		String filePath = message.getMessage();
+
+		File f = new File(filePath);
+		String fullPath = f.getAbsolutePath();
+		String onlyLocation = fullPath.substring(0,fullPath.lastIndexOf(File.separator));
+		
 		Path p = Paths.get(filePath);
 		String fileName = p.getFileName().toString();
 		
 		for (int i = clientList.size() - 1; i >= 0; i--) {
 			ClientThread ct = clientList.get(i);
 			String clientName = ct.username;
-			String fileToWrite = location + "\\" + clientName + "\\" + fileName;
+			String fileToWrite = onlyLocation + "\\" + clientName + "\\" + fileName;
 			message.setMessage(fileToWrite);
 			ct.writeFile(message);
 		}
@@ -97,10 +100,12 @@ public class Server {
 	
 	private synchronized void unicastFile(String receiverUsername, ChatMessage message) {
 
-		final String location = 
-        		"C:\\Users\\Hamza Karachiwala\\Documents\\Fall 16\\Networks\\Project\\";
+		String filePath = message.getMessage();		
 
-		String filePath = message.getMessage();
+		File f = new File(filePath);
+		String fullPath = f.getAbsolutePath();
+		String onlyLocation = fullPath.substring(0,fullPath.lastIndexOf(File.separator));
+
 		Path p = Paths.get(filePath);
 		String fileName = p.getFileName().toString();
 		
@@ -109,7 +114,7 @@ public class Server {
 			ClientThread ct = clientList.get(i);
 			if(ct.username.equalsIgnoreCase(receiverUsername)){
 				String clientName = ct.username;
-				String fileToWrite = location + "\\" + clientName + "\\" + fileName;
+				String fileToWrite = onlyLocation + "\\" + clientName + "\\" + fileName;
 				message.setMessage(fileToWrite);
 				ct.writeFile(message);
 			}
